@@ -1,10 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from statusChecker import status_check
-import time
 
-
-from dtos.dtos import GenerationResponse
 from service import otpService
 
 from dtos import dtos

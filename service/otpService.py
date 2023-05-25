@@ -3,24 +3,18 @@ from random import random
 from uuid import uuid4
 from dtos.dtos import GenerationResponse, OtpValidationResponse, GetPinResponse, OtpHistoryResponse, \
     OtpInvalidationResponse
-import os
-from dotenv import dotenv_values
+
 
 import certifi as certifi
 import motor.motor_asyncio
 
 from schemas import Otp, OtpHistory
 
-config_env = {
-    **dotenv_values(".env"),  # load local file development variables
-    **os.environ,  # override loaded values with system environment variables
-}
+from config import Settings
 
-mongo_url = os.environ.get('MONGO_URL')
+configs = Settings()
 
-# client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
-client = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://admin:ctt123@cluster0.voemkxz.mongodb.net',
-                                                tlsCAFile=certifi.where())
+client = motor.motor_asyncio.AsyncIOMotorClient(configs.MONGO_VAR,tlsCAFile=certifi.where())
 db = client.Fast  # database name
 otpCollection = db.FastAPICollection  # collection name
 

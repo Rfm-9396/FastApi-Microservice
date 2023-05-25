@@ -1,24 +1,20 @@
+
 from datetime import datetime
 from pymongo import MongoClient
 import certifi as certifi
+from schemas import Otp, OtpHistory
 from config import Settings
 
 aa = Settings()
-print(aa.MONGO_VAR)
 
-
-
-from schemas import Otp, OtpHistory
-
-client = MongoClient(aa.MONGO_VAR,
-                     tlsCAFile=certifi.where())
+client = MongoClient(aa.MONGO_VAR,tlsCAFile=certifi.where()) # tlsCAFile=certifi.where() is required for SSL connection
 
 db = client.Fast  # database name
 otpCollection = db.FastAPICollection  # collection name
 
 
 def status_check():
-    otps = otpCollection.find({"currentStatus": 0})
+    otps = otpCollection.find({"currentStatus": 0}) # 0 means otp is generated but not validated
     otps_as_list = list(otps)
     print(f"Total {len(otps_as_list)}")
     skipped = 0
@@ -27,13 +23,13 @@ def status_check():
     for otp in otps_as_list:
         otpModel = Otp(**otp)
         print(otp['expiryOn'])
-        if otp['expiryOn'] < datetime.now():
+        if otp['expiryOn'] < datetime.now(): # if otp is expired
             otp_History = OtpHistory(
                 stateId=2,
                 stateDescription="OTP Expired",
                 stateDate=datetime.now()
             )
-            otpModel.stateHistory.append(otp_History)
+            otpModel.stateHistory.append(otp_History) # add otp history
             otpModel.currentStatus = 2
             otpCollection.update_one({"genId": otp['genId']}, {"$set": otpModel.dict()})
 
@@ -47,3 +43,5 @@ def status_check():
 
 
 status_check()
+
+
