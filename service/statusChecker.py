@@ -1,9 +1,6 @@
 from datetime import datetime
 from pymongo import MongoClient
 import certifi as certifi
-
-import os
-
 from config import Settings
 
 aa = Settings()

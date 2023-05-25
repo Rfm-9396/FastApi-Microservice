@@ -1,26 +1,12 @@
-import asyncio
+
 from datetime import datetime
-import time
-import json
 from pymongo import MongoClient
-
 import certifi as certifi
-import motor.motor_asyncio
-import os
-
-from bson import ObjectId
-from typing import Any
-
 from schemas import Otp, OtpHistory
-
 from config import Settings
 
 aa = Settings()
 
-
-# client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
-# client = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://admin:ctt123@cluster0.voemkxz.mongodb.net',
-# tlsCAFile=certifi.where())
 client = MongoClient(aa.MONGO_VAR,
                      tlsCAFile=certifi.where())
 
