@@ -1,3 +1,6 @@
-import os
+from fastapi import Depends
 
-print(os.environ.get('MONGO_URL'))
+from config import Settings
+
+aa = Settings()
+print(aa.MONGO_VAR)

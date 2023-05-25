@@ -13,12 +13,15 @@ from typing import Any
 
 from schemas import Otp, OtpHistory
 
-mongo_url = os.environ.get('MONGO_URL')
+from config import Settings
+
+aa = Settings()
+
 
 # client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
 # client = motor.motor_asyncio.AsyncIOMotorClient('mongodb+srv://admin:ctt123@cluster0.voemkxz.mongodb.net',
 # tlsCAFile=certifi.where())
-client = MongoClient('mongodb+srv://admin:ctt123@cluster0.voemkxz.mongodb.net',
+client = MongoClient(aa.MONGO_VAR,
                      tlsCAFile=certifi.where())
 
 db = client.Fast  # database name

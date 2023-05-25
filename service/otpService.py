@@ -4,11 +4,17 @@ from uuid import uuid4
 from dtos.dtos import GenerationResponse, OtpValidationResponse, GetPinResponse, OtpHistoryResponse, \
     OtpInvalidationResponse
 import os
+from dotenv import dotenv_values
 
 import certifi as certifi
 import motor.motor_asyncio
 
 from schemas import Otp, OtpHistory
+
+config_env = {
+    **dotenv_values(".env"),  # load local file development variables
+    **os.environ,  # override loaded values with system environment variables
+}
 
 mongo_url = os.environ.get('MONGO_URL')
 
