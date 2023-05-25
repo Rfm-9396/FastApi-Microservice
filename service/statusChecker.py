@@ -4,12 +4,16 @@ import certifi as certifi
 
 import os
 
+from config import Settings
+
+aa = Settings()
+print(aa.MONGO_VAR)
+
 
 
 from schemas import Otp, OtpHistory
 
-mongo_url = os.environ.get('MONGO_URL')
-client = MongoClient('mongodb+srv://admin:ctt123@cluster0.voemkxz.mongodb.net',
+client = MongoClient(aa.MONGO_VAR,
                      tlsCAFile=certifi.where())
 
 db = client.Fast  # database name
