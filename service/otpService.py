@@ -24,7 +24,7 @@ async def generate_otp(api_client_id):
     gen_id = str(uuid4())
     api_client_id = api_client_id
     otp_pin = pinGen()
-    #encrypted_pin = encrypt_pin(otp_pin)
+    encrypted_pin = encrypt_pin(otp_pin)
 
     otp_history = OtpHistory(
         stateId=0,
@@ -35,7 +35,7 @@ async def generate_otp(api_client_id):
 
     otp = Otp(
         genId=gen_id,
-        otpPin=otp_pin,
+        otpPin=encrypted_pin,
         currentStatus=0,
         apiClientId=api_client_id,
         stateHistory=[otp_history],
@@ -77,8 +77,11 @@ async def validate_otp(otp_validation_request):
         return OtpValidationResponse(
             message="Invalid API Client Id"
         )
+    print(decrypt_pin(otp['otpPin']))
+    print(otp_validation_request.otpPin)
     # All validations passed ___________________________________________________________________________________________
-    if decrypt_pin(otp['otpPin']) == otp_validation_request.otpPin:
+    if int(decrypt_pin(otp['otpPin'])) == otp_validation_request.otpPin:
+        print('im here')
         otp_history = OtpHistory(
             stateId=1,
             stateDescription="OTP Validated",
@@ -92,6 +95,7 @@ async def validate_otp(otp_validation_request):
             message="OTP Validated"
         )
     else:
+        print('im here 2')
         return OtpValidationResponse(
             message="Invalid OTP PIN"
         )
@@ -126,7 +130,7 @@ async def get_otp_history(gen_id, api_client_id):
         )
     else:
         return OtpHistoryResponse(
-            message="OTP History",
+            message="OTP Found",
             stateHistory=otp['stateHistory']
         )
 
@@ -144,6 +148,10 @@ async def invalidate_otp(otp_invalidation_request):
     if otp['currentStatus'] != 0:
         return OtpInvalidationResponse(
             message="OTP already validated or expired"
+        )
+    if int(decrypt_pin(otp['otpPin'])) != otp_invalidation_request.otpPin:
+        return OtpInvalidationResponse(
+            message="Invalid OTP PIN"
         )
     else:
 
