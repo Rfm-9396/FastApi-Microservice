@@ -12,6 +12,8 @@ class GenerationResponse(BaseModel):
     genId: str
     otpPin: int
     apiClientId: str
+    expiryOn: datetime
+    currentStatus: int
 
 
 class GetPinRequest(BaseModel):

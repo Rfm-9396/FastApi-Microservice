@@ -12,7 +12,7 @@ class OtpHistory(BaseModel):
 
 class Otp(BaseModel):
     genId: str
-    otpPin: int
+    otpPin: str
     apiClientId: str
     expiryOn: datetime
     currentStatus: int # 0 - Active, 1 - Inactive

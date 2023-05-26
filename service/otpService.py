@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from random import random
+from utils.EncryptPin import encrypt_pin, decrypt_pin
 from uuid import uuid4
 from dtos.dtos import GenerationResponse, OtpValidationResponse, GetPinResponse, OtpHistoryResponse, \
     OtpInvalidationResponse
@@ -11,6 +11,7 @@ import motor.motor_asyncio
 from schemas import Otp, OtpHistory
 
 from config import Settings
+from utils.pinGen import pinGen
 
 configs = Settings()
 
@@ -22,7 +23,8 @@ otpCollection = db.FastAPICollection  # collection name
 async def generate_otp(api_client_id):
     gen_id = str(uuid4())
     api_client_id = api_client_id
-    otp_pin = int(random() * 10000)
+    otp_pin = pinGen()
+    #encrypted_pin = encrypt_pin(otp_pin)
 
     otp_history = OtpHistory(
         stateId=0,
@@ -30,19 +32,23 @@ async def generate_otp(api_client_id):
         stateDate=datetime.now()
     )
 
-    generation_response = GenerationResponse(
-        message="OTP Generated",
-        genId=str(uuid4()),
-        otpPin=int(random() * 10000),
-        apiClientId=api_client_id
-    )
+
     otp = Otp(
         genId=gen_id,
         otpPin=otp_pin,
         currentStatus=0,
         apiClientId=api_client_id,
         stateHistory=[otp_history],
-        expiryOn=datetime.now() + timedelta(minutes=100)
+        expiryOn=datetime.now() + timedelta(minutes=configs.TTL)
+    )
+
+    generation_response = GenerationResponse(
+        message="OTP Generated",
+        genId=gen_id,
+        otpPin=otp_pin,
+        apiClientId=api_client_id,
+        currentStatus=0,
+        expiryOn=otp.expiryOn
     )
 
     result = await otpCollection.insert_one(otp.dict())
@@ -72,7 +78,7 @@ async def validate_otp(otp_validation_request):
             message="Invalid API Client Id"
         )
     # All validations passed ___________________________________________________________________________________________
-    if otp['otpPin'] == otp_validation_request.otpPin:
+    if decrypt_pin(otp['otpPin']) == otp_validation_request.otpPin:
         otp_history = OtpHistory(
             stateId=1,
             stateDescription="OTP Validated",
